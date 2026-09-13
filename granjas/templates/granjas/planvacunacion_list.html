@@ -1,0 +1,36 @@
+{% extends 'granjas/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Planes de Vacunación</h2>
+    <a href="{% url 'granjas:planvacunacion_create' %}" class="btn btn-primary">+ Nuevo Plan</a>
+</div>
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Lote</th>
+            <th>Vacuna</th>
+            <th>Veterinario</th>
+            <th>F. Programada</th>
+            <th>F. Aplicada</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for plan in planes %}
+        <tr>
+            <td>{{ plan.lote.codigo_lote }}</td>
+            <td>{{ plan.vacuna.nombre_comercial }}</td>
+            <td>{{ plan.veterinario.nombre_completo }}</td>
+            <td>{{ plan.fecha_programada }}</td>
+            <td>{{ plan.fecha_aplicada|default:"Pendiente" }}</td>
+            <td>
+                <a href="{% url 'granjas:planvacunacion_update' plan.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'granjas:planvacunacion_delete' plan.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center">No hay planes de vacunación programados.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

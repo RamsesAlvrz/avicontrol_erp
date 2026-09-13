@@ -1,0 +1,41 @@
+{% extends 'granjas/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Gestión de Granjas</h2>
+    <a href="{% url 'granjas:granja_create' %}" class="btn btn-primary">+ Nueva Granja</a>
+</div>
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Nombre</th>
+            <th>Dirección</th>
+            <th>Capacidad (Aves)</th>
+            <th>Licencia Sanitaria (1:1)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for granja in granjas %}
+        <tr>
+            <td>{{ granja.nombre }}</td>
+            <td>{{ granja.direccion }}</td>
+            <td>{{ granja.capacidad_total }}</td>
+            <td>
+                {% if granja.licencia_sanitaria %}
+                    <span class="badge bg-success">{{ granja.licencia_sanitaria.codigo_resolucion }}</span>
+                {% else %}
+                    <span class="badge bg-secondary">Sin Licencia</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'granjas:granja_detail' granja.pk %}" class="btn btn-sm btn-info text-white">Ver Detalle</a>
+                <a href="{% url 'granjas:granja_update' granja.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'granjas:granja_delete' granja.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center">No hay granjas registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

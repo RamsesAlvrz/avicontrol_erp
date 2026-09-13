@@ -1,0 +1,34 @@
+{% extends 'granjas/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Gestión de Galpones</h2>
+    <a href="{% url 'granjas:galpon_create' %}" class="btn btn-primary">+ Nuevo Galpón</a>
+</div>
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Código Galpón</th>
+            <th>Granja Asignada</th>
+            <th>Tipo</th>
+            <th>Capacidad</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for galpon in galpones %}
+        <tr>
+            <td>{{ galpon.numero }}</td>
+            <td>{{ galpon.granja.nombre }}</td>
+            <td>{{ galpon.get_tipo_galpon_display }}</td>
+            <td>{{ galpon.capacidad }}</td>
+            <td>
+                <a href="{% url 'granjas:galpon_update' galpon.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'granjas:galpon_delete' galpon.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center">No hay galpones registrados.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

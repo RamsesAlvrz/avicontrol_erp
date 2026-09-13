@@ -1,0 +1,34 @@
+{% extends 'granjas/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Fórmulas de Alimento</h2>
+    <a href="{% url 'granjas:formulaalimento_create' %}" class="btn btn-primary">+ Nueva Fórmula</a>
+</div>
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Nombre Fórmula</th>
+            <th>Etapa Nutricional</th>
+            <th>Materia Prima Principal</th>
+            <th>% Proteína</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for formula in formulas %}
+        <tr>
+            <td>{{ formula.nombre_formula }}</td>
+            <td>{{ formula.etapa_nutricional }}</td>
+            <td>{{ formula.materia_prima.nombre }}</td>
+            <td>{{ formula.porcentaje_proteina }}%</td>
+            <td>
+                <a href="{% url 'granjas:formulaalimento_update' formula.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'granjas:formulaalimento_delete' formula.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center">No hay fórmulas registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

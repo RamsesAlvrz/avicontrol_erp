@@ -1,0 +1,105 @@
+{% extends 'granjas/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Detalle de Granja: {{ granja.nombre }}</h2>
+        <a href="{% url 'granjas:granja_list' %}" class="btn btn-secondary">Volver al Listado</a>
+    </div>
+
+    <!-- SECCIÓN 1: RELACIÓN 1:1 (Licencia Sanitaria) -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="card-title m-0">Licencia Sanitaria</h5>
+        </div>
+        <div class="card-body">
+            {% if granja.licencia_sanitaria %}
+                <p><strong>Código de Resolución:</strong> {{ granja.licencia_sanitaria.codigo_resolucion }}</p>
+                <p><strong>Fecha de Emisión:</strong> {{ granja.licencia_sanitaria.fecha_emision }}</p>
+                <p><strong>Fecha de Vencimiento:</strong> {{ granja.licencia_sanitaria.fecha_vencimiento }}</p>
+                <p><strong>Estado:</strong> 
+                    {% if granja.licencia_sanitaria.esta_vigente %}
+                        <span class="badge bg-success">Vigente</span>
+                    {% else %}
+                        <span class="badge bg-danger">Vencida</span>
+                    {% endif %}
+                </p>
+            {% else %}
+                <p class="text-muted m-0">Esta granja no cuenta con una licencia sanitaria registrada.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: RELACIÓN 1:N (Inspecciones Sanitarias) -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h5 class="card-title m-0">Historial de Inspecciones Sanitarias</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Fecha de Inspección</th>
+                        <th>Resultado</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inspeccion in granja.inspecciones.all %}
+                    <tr>
+                        <td>{{ inspeccion.fecha_inspeccion }}</td>
+                        <td>
+                            <span class="badge {% if inspeccion.resultado == 'Aprobado' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                {{ inspeccion.resultado }}
+                            </span>
+                        </td>
+                        <td>{{ inspeccion.observaciones|default:"Sin observaciones" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-muted">No se han registrado inspecciones para esta granja.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 3: RELACIÓN N:M (Contratos y Proveedores) -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="card-title m-0">Proveedores Asociados via Contrato</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Proveedor</th>
+                        <th>RUC / Identificación</th>
+                        <th>Fecha Inicio Contrato</th>
+                        <th>Estado Contrato</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contrato in granja.contratoproveedor_set.all %}
+                    <tr>
+                        <td><strong>{{ contrato.proveedor.nombre }}</strong></td>
+                        <td>{{ contrato.proveedor.ruc|default:"N/A" }}</td>
+                        <td>{{ contrato.fecha_inicio }}</td>
+                        <td>
+                            <span class="badge {% if contrato.estado_contrato == 'Activo' %}bg-success{% else %}bg-secondary{% endif %}">
+                                {{ contrato.estado_contrato }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-muted">No existen contratos registrados con proveedores.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
