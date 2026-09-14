@@ -160,6 +160,12 @@ class Lote(models.Model):
     fecha_ingreso = models.DateField(verbose_name="Fecha de Ingreso")
     raza = models.CharField(max_length=50, verbose_name="Raza")
     estado = models.CharField(max_length=20, choices=ESTADO_LOTE, default='CRECIMIENTO', verbose_name="Estado")
+    veterinarios = models.ManyToManyField(
+        'Veterinario',
+        through='VisitaVeterinaria',
+        related_name='lotes_atendidos',
+        verbose_name="Veterinarios que atendieron"
+    )
 
     class Meta:
         verbose_name = "Lote"
@@ -411,3 +417,85 @@ class CompraMateriaPrima(models.Model):
         verbose_name = "Compra de Materia Prima"
         verbose_name_plural = "Compras de Materias Primas"
         ordering = ['-id']
+
+# ============================================
+# PARTE 2 - EJERCICIO 10: Relación 1:1
+# ============================================
+class PerfilSanitarioLote(models.Model):
+    """
+    Ficha complementaria del Lote: no son 'más campos' del Lote porque
+    este perfil solo se genera tras la primera evaluación sanitaria
+    (puede no existir aún si el lote acaba de ingresar), y agrupa
+    indicadores de desempeño que pertenecen a un módulo distinto
+    (control sanitario) del que gestiona el ciclo de vida del lote.
+    """
+    lote = models.OneToOneField(
+        Lote,
+        on_delete=models.CASCADE,
+        related_name='perfil_sanitario',
+        verbose_name="Lote"
+    )
+    peso_promedio_gr = models.DecimalField(
+        max_digits=6, decimal_places=2, verbose_name="Peso Promedio (g)"
+    )
+    indice_mortalidad = models.DecimalField(
+        max_digits=5, decimal_places=2, verbose_name="Índice de Mortalidad (%)"
+    )
+    conversion_alimenticia = models.DecimalField(
+        max_digits=5, decimal_places=2, verbose_name="Índice de Conversión Alimenticia"
+    )
+    certificado_sanitario = models.BooleanField(
+        default=False, verbose_name="¿Cuenta con Certificado Sanitario?"
+    )
+    fecha_evaluacion = models.DateField(
+        auto_now_add=True, verbose_name="Fecha de Evaluación"
+    )
+
+    class Meta:
+        verbose_name = "Perfil Sanitario de Lote"
+        verbose_name_plural = "Perfiles Sanitarios de Lote"
+
+    def __str__(self):
+        return f"Perfil Sanitario - {self.lote.codigo_lote}"
+
+
+# ============================================
+# PARTE 2 - EJERCICIO 10: Relación N:M con through
+# ============================================
+class VisitaVeterinaria(models.Model):
+    """
+    Modelo intermedio entre Lote y Veterinario: un veterinario visita
+    muchos lotes a lo largo del tiempo, y un lote puede ser visitado
+    por distintos veterinarios (especialistas). La relación en sí
+    necesita guardar la fecha de la visita y el diagnóstico emitido,
+    datos que no pertenecen ni al Lote ni al Veterinario individualmente,
+    sino al evento de la visita.
+    """
+    ESTADO_CHOICES = [
+        ('SALUDABLE', 'Saludable'),
+        ('OBSERVACION', 'En Observación'),
+        ('CRITICO', 'Crítico'),
+    ]
+
+    lote = models.ForeignKey(
+        Lote, on_delete=models.CASCADE,
+        related_name='visitas_veterinarias', verbose_name="Lote"
+    )
+    veterinario = models.ForeignKey(
+        Veterinario, on_delete=models.PROTECT,
+        related_name='visitas_realizadas', verbose_name="Veterinario"
+    )
+    fecha_visita = models.DateField(verbose_name="Fecha de Visita")
+    diagnostico = models.TextField(verbose_name="Diagnóstico")
+    estado_lote = models.CharField(
+        max_length=20, choices=ESTADO_CHOICES,
+        default='SALUDABLE', verbose_name="Estado del Lote"
+    )
+
+    class Meta:
+        verbose_name = "Visita Veterinaria"
+        verbose_name_plural = "Visitas Veterinarias"
+        ordering = ['-fecha_visita']
+
+    def __str__(self):
+        return f"Visita {self.fecha_visita} - {self.lote.codigo_lote} ({self.veterinario.nombre_completo})"

@@ -586,3 +586,47 @@ def compramateriaprima_delete(request, pk):
         compra.delete()
         return redirect('granjas:compramateriaprima_list')
     return render(request, 'granjas/generic_confirm_delete.html', {'objeto': compra, 'redirect_url': 'granjas:compramateriaprima_list'})
+# ============================================
+# PARTE 2 - EJERCICIO 12: Vista de detalle de Lote con relaciones
+# ============================================
+def lote_detail(request, pk):
+    """
+    - select_related('perfil_sanitario'): resuelve la relación 1:1 en el mismo JOIN.
+    - prefetch_related: trae las visitas veterinarias (N:M a través de VisitaVeterinaria)
+      y también el galpón (para mostrar contexto) en consultas optimizadas.
+    """
+    lote = get_object_or_404(
+        Lote.objects.select_related('perfil_sanitario', 'galpon').prefetch_related(
+            'visitas_veterinarias__veterinario'
+        ),
+        pk=pk
+    )
+    return render(request, 'granjas/lote_detail.html', {'lote': lote})
+# ============================================
+# PARTE 2 - EJERCICIO 13: CRUD de VisitaVeterinaria (modelo intermedio)
+# ============================================
+def visita_list(request):
+    visitas = VisitaVeterinaria.objects.select_related('lote', 'veterinario').order_by('-fecha_visita')
+    return render(request, 'granjas/visita_list.html', {'visitas': visitas})
+
+def visita_create(request):
+    form = VisitaVeterinariaForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        return redirect('granjas:visita_list')
+    return render(request, 'granjas/generic_form.html', {'form': form, 'titulo': 'Registrar Visita Veterinaria'})
+
+def visita_update(request, pk):
+    visita = get_object_or_404(VisitaVeterinaria, pk=pk)
+    form = VisitaVeterinariaForm(request.POST or None, instance=visita)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        return redirect('granjas:visita_list')
+    return render(request, 'granjas/generic_form.html', {'form': form, 'titulo': 'Actualizar Visita Veterinaria'})
+
+def visita_delete(request, pk):
+    visita = get_object_or_404(VisitaVeterinaria, pk=pk)
+    if request.method == 'POST':
+        visita.delete()
+        return redirect('granjas:visita_list')
+    return render(request, 'granjas/generic_confirm_delete.html', {'objeto': visita, 'redirect_url': 'granjas:visita_list'})

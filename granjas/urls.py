@@ -22,6 +22,7 @@ urlpatterns = [
     path('lotes/crear/', views.lote_create, name='lote_create'),
     path('lotes/editar/<int:pk>/', views.lote_update, name='lote_update'),
     path('lotes/eliminar/<int:pk>/', views.lote_delete, name='lote_delete'),
+    path('lotes/<int:pk>/', views.lote_detail, name='lote_detail'),
 
     # Equipamiento
     path('equipos/', views.equipamiento_list, name='equipamiento_list'),
@@ -124,4 +125,9 @@ urlpatterns = [
     path('compras-materia-prima/crear/', views.compramateriaprima_create, name='compramateriaprima_create'),
     path('compras-materia-prima/editar/<int:pk>/', views.compramateriaprima_update, name='compramateriaprima_update'),
     path('compras-materia-prima/eliminar/<int:pk>/', views.compramateriaprima_delete, name='compramateriaprima_delete'),
+    # Visitas Veterinarias (CRUD del modelo intermedio)
+    path('visitas/', views.visita_list, name='visita_list'),
+    path('visitas/crear/', views.visita_create, name='visita_create'),
+    path('visitas/editar/<int:pk>/', views.visita_update, name='visita_update'),
+    path('visitas/eliminar/<int:pk>/', views.visita_delete, name='visita_delete'),
 ]

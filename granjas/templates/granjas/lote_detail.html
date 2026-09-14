@@ -1,0 +1,85 @@
+{% extends 'granjas/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Detalle de Lote: {{ lote.codigo_lote }}</h2>
+        <a href="{% url 'granjas:lote_list' %}" class="btn btn-secondary">Volver al Listado</a>
+    </div>
+
+    <!-- Datos generales del Lote -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="card-title m-0">Información General</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Galpón:</strong> {{ lote.galpon.numero }} ({{ lote.galpon.granja.nombre }})</p>
+            <p><strong>Raza:</strong> {{ lote.raza }}</p>
+            <p><strong>Cantidad Inicial:</strong> {{ lote.cantidad_inicial }}</p>
+            <p><strong>Fecha de Ingreso:</strong> {{ lote.fecha_ingreso }}</p>
+            <p><strong>Estado:</strong>
+                <span class="badge bg-success">{{ lote.get_estado_display }}</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 1: RELACIÓN 1:1 (Perfil Sanitario) -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="card-title m-0">Perfil Sanitario (Relación 1:1)</h4>
+        </div>
+        <div class="card-body">
+            {% if lote.perfil_sanitario %}
+                <p><strong>Peso Promedio:</strong> {{ lote.perfil_sanitario.peso_promedio_gr }} g</p>
+                <p><strong>Índice de Mortalidad:</strong> {{ lote.perfil_sanitario.indice_mortalidad }}%</p>
+                <p><strong>Conversión Alimenticia:</strong> {{ lote.perfil_sanitario.conversion_alimenticia }}</p>
+                <p><strong>Certificado Sanitario:</strong>
+                    {% if lote.perfil_sanitario.certificado_sanitario %}
+                        <span class="badge bg-success">Sí</span>
+                    {% else %}
+                        <span class="badge bg-danger">No</span>
+                    {% endif %}
+                </p>
+            {% else %}
+                <p class="text-muted m-0">Este lote no cuenta con perfil sanitario registrado.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: RELACIÓN N:M (Visitas Veterinarias vía through) -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h4 class="card-title m-0">Historial de Visitas Veterinarias (Relación N:M)</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Veterinario</th>
+                        <th>Diagnóstico</th>
+                        <th>Estado del Lote</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visita in lote.visitas_veterinarias.all %}
+                    <tr>
+                        <td>{{ visita.fecha_visita }}</td>
+                        <td>{{ visita.veterinario.nombre_completo }}</td>
+                        <td>{{ visita.diagnostico }}</td>
+                        <td>
+                            <span class="badge {% if visita.estado_lote == 'SALUDABLE' %}bg-success{% elif visita.estado_lote == 'OBSERVACION' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                {{ visita.get_estado_lote_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-muted">No se han registrado visitas veterinarias para este lote.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
