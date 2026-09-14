@@ -228,3 +228,14 @@ class CompraMateriaPrimaForm(forms.ModelForm):
             'precio_unitario': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'costo_total': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
         }
+        # ============================================
+# PARTE 2 - EJERCICIO 13: Formulario del modelo intermedio
+# ============================================
+class VisitaVeterinariaForm(forms.ModelForm):
+    class Meta:
+        model = VisitaVeterinaria
+        fields = ['lote', 'veterinario', 'fecha_visita', 'diagnostico', 'estado_lote']
+        widgets = {
+            'fecha_visita': forms.DateInput(attrs={'type': 'date'}),
+            'diagnostico': forms.Textarea(attrs={'rows': 3}),
+        }

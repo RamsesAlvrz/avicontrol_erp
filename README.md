@@ -53,3 +53,47 @@ python manage.py migrate
 
 # 6. Levantar el servidor
 python manage.py runserver
+
+## Laboratorio 04 — Relaciones entre Modelos (OneToOne, ForeignKey, ManyToMany)
+
+### Descripción
+Se amplió el modelo de datos de AvicontrolERP (desarrollado en el Laboratorio 03) incorporando
+los tres tipos de relación que ofrece Django ORM: uno a uno, uno a muchos y muchos a muchos
+mediante un modelo intermedio explícito (through).
+
+### Relaciones implementadas
+
+**1. Uno a Uno (OneToOneField)**
+- `PerfilSanitarioLote` → `Lote`
+- Representa una ficha extendida que se genera tras la primera evaluación sanitaria de un lote
+  (peso promedio, índice de mortalidad, conversión alimenticia, certificado sanitario).
+- `on_delete=CASCADE`: si el lote se elimina, su perfil sanitario deja de tener sentido.
+
+**2. Uno a Muchos (ForeignKey)** *(ya existente desde el Lab 03, documentada nuevamente)*
+- `Galpon → Granja` (`related_name='galpones'`, `on_delete=CASCADE`)
+- `Lote → Galpon` (`related_name='lotes'`, `on_delete=CASCADE`)
+- Un galpón pertenece a una sola granja; un lote pertenece a un solo galpón. CASCADE porque
+  las entidades hijas no tienen sentido de negocio sin su entidad padre.
+
+**3. Muchos a Muchos con modelo intermedio (ManyToManyField + through)**
+- `Lote ↔ Veterinario` a través de `VisitaVeterinaria`
+- Un veterinario puede visitar muchos lotes, y un lote puede recibir visitas de distintos
+  veterinarios especialistas a lo largo de su ciclo de vida.
+- El modelo intermedio `VisitaVeterinaria` guarda `fecha_visita`, `diagnostico` y `estado_lote`:
+  datos propios del evento de la visita, no de las entidades relacionadas.
+- CRUD completo implementado en `/granjas/visitas/`.
+
+### Entidades totales del modelo
+20 entidades originales (Lab 03) + `PerfilSanitarioLote` + `VisitaVeterinaria` = **22 entidades**.
+
+### Optimización de consultas
+- `select_related()` para relaciones 1:1 y FK (evita consultas N+1 en relaciones de objeto único).
+- `prefetch_related()` para relaciones inversas y N:M (evita duplicación de filas en JOINs de
+  colecciones).
+
+### Rutas principales agregadas
+- `GET /granjas/lotes/<id>/` — Detalle de lote con perfil sanitario y visitas veterinarias.
+- `GET /granjas/visitas/` — Listado de visitas veterinarias.
+- `GET/POST /granjas/visitas/crear/` — Registrar visita.
+- `GET/POST /granjas/visitas/editar/<id>/` — Editar visita.
+- `GET/POST /granjas/visitas/eliminar/<id>/` — Eliminar visita.
