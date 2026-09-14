@@ -53,7 +53,7 @@ python manage.py migrate
 
 # 6. Levantar el servidor
 python manage.py runserver
-
+```
 ## Laboratorio 04 — Relaciones entre Modelos (OneToOne, ForeignKey, ManyToMany)
 
 ### Descripción
