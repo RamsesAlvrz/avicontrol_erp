@@ -144,3 +144,24 @@ interfaz orientada al usuario final: para presentar reportes, dashboards o formu
 adaptados al flujo de negocio (por ejemplo, un panel de trazabilidad de lotes para el
 Administrador de Granja), sigue siendo necesario implementar Views y Templates
 personalizados, tal como se hizo en los Laboratorios 03 y 04.
+
+## Laboratorio 06 — Refactorización de Plantillas (Herencia, Filtros, Include y Seguridad XSS)
+
+### Descripción
+Se refactorizó la capa de presentación (Templates) del sistema `Avicontrol ERP` mediante el uso de la sintaxis avanzada del motor de plantillas de Django, logrando una arquitectura visual modular, mantenible y segura sin modificar las Views ni las URLs preexistentes.
+
+### Aspectos Implementados
+1. **Herencia de Plantillas (`{% extends %}` y `{% block %}`):**
+   - Creación de la plantilla base `base.html` con estructura HTML5, Bootstrap 5 y barra de navegación superior categorizada por módulos.
+   - Migración de las pantallas del CRUD (`granja_list.html`, `lote_list.html`, `proveedor_list.html`, etc.) para heredar de `base.html`.
+
+2. **Filtros de Plantilla (Formatting):**
+   - Aplicación de `|upper` para estandarizar nombres de entidades en mayúsculas (ej. `granja.nombre`).
+   - Aplicación de `|floatformat:0` para formatear valores numéricos de capacidad.
+   - Aplicación de `|default:"-"` para manejar valores nulos en campos como email.
+
+3. **Reutilización de Componentes (`{% include %}`):**
+   - Extracción de componentes repetidos al parcial `granjas/includes/_acciones_tabla.html` para renderizar dinámicamente los botones de acción (`Ver Detalle`, `Editar`, `Eliminar`) en los listados.
+
+4. **Validación de Seguridad y Auto-escape XSS:**
+   - Verificación del *auto-escaping* nativo de Django al probar la inyección de etiquetas `<script>` en formularios, confirmando la sanitización a entidades HTML (`&lt;script&gt;`) y previniendo ataques Cross-Site Scripting.
