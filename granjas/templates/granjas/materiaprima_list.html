@@ -1,0 +1,34 @@
+{% extends 'granjas/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Gestión de Materia Prima</h2>
+    <a href="{% url 'granjas:materiaprima_create' %}" class="btn btn-primary">+ Nueva Materia Prima</a>
+</div>
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Nombre</th>
+            <th>Tipo Insumo</th>
+            <th>Unidad Medida</th>
+            <th>Stock Mínimo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for materia in materias %}
+        <tr>
+            <td>{{ materia.nombre }}</td>
+            <td>{{ materia.tipo_insumo }}</td>
+            <td>{{ materia.unidad_medida }}</td>
+            <td>{{ materia.stock_minimo }}</td>
+            <td>
+                <a href="{% url 'granjas:materiaprima_update' materia.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'granjas:materiaprima_delete' materia.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center">No hay materias primas registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

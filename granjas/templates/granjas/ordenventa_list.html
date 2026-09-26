@@ -1,0 +1,38 @@
+{% extends 'granjas/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Órdenes de Venta</h2>
+    <a href="{% url 'granjas:ordenventa_create' %}" class="btn btn-primary">+ Nueva Orden</a>
+</div>
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>N° Comprobante</th>
+            <th>Cliente</th>
+            <th>Transporte</th>
+            <th>Fecha Emisión</th>
+            <th>Monto Total</th>
+            <th>Estado Entrega</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for orden in ordenes %}
+        <tr>
+            <td>{{ orden.numero_comprobante }}</td>
+            <td>{{ orden.cliente.razon_social }}</td>
+            <td>{{ orden.transporte.placa }}</td>
+            <td>{{ orden.fecha_emision }}</td>
+            <td>S/ {{ orden.monto_total }}</td>
+            <td>{{ orden.get_estado_entrega_display|default:orden.estado_entrega }}</td>
+            <td>
+                <a href="{% url 'granjas:ordenventa_update' orden.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'granjas:ordenventa_delete' orden.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="text-center">No hay órdenes de venta registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

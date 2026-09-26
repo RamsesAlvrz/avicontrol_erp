@@ -1,0 +1,34 @@
+{% extends 'granjas/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Producción / Cosecha de Huevo</h2>
+    <a href="{% url 'granjas:produccionhuevo_create' %}" class="btn btn-primary">+ Registrar Cosecha</a>
+</div>
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Fecha Cosecha</th>
+            <th>Categoría</th>
+            <th>Cantidad Jabas</th>
+            <th>Observaciones</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for prod in producciones %}
+        <tr>
+            <td>{{ prod.fecha_cosecha }}</td>
+            <td>{{ prod.get_categoria_display|default:prod.categoria }}</td>
+            <td>{{ prod.cantidad_jabas }}</td>
+            <td>{{ prod.observaciones }}</td>
+            <td>
+                <a href="{% url 'granjas:produccionhuevo_update' prod.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'granjas:produccionhuevo_delete' prod.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center">No hay producciones de huevo registradas.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

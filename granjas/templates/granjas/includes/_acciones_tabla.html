@@ -1,0 +1,6 @@
+{# Fragmento reutilizable de botones de acciones para tablas #}
+{% if detail_url %}
+    <a href="{% url detail_url item_pk %}" class="btn btn-sm btn-info text-white">Ver Detalle</a>
+{% endif %}
+<a href="{% url update_url item_pk %}" class="btn btn-sm btn-warning">Editar</a>
+<a href="{% url delete_url item_pk %}" class="btn btn-sm btn-danger">Eliminar</a>
