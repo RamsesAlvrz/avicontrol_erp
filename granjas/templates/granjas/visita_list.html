@@ -15,23 +15,9 @@
             <th>Acciones</th>
         </tr>
     </thead>
-    <tbody>
+        <tbody>
         {% for visita in visitas %}
-        <tr>
-            <td>{{ visita.lote.codigo_lote }}</td>
-            <td>{{ visita.veterinario.nombre_completo }}</td>
-            <td>{{ visita.fecha_visita }}</td>
-            <td>{{ visita.diagnostico|truncatechars:40 }}</td>
-            <td>
-                <span class="badge {% if visita.estado_lote == 'SALUDABLE' %}bg-success{% elif visita.estado_lote == 'OBSERVACION' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
-                    {{ visita.get_estado_lote_display }}
-                </span>
-            </td>
-            <td>
-                <a href="{% url 'granjas:visita_update' visita.pk %}" class="btn btn-sm btn-warning">Editar</a>
-                <a href="{% url 'granjas:visita_delete' visita.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
-            </td>
-        </tr>
+            {% include 'granjas/includes/_visita_row.html' with visita=visita mostrar_lote=True mostrar_acciones=True %}
         {% empty %}
         <tr><td colspan="6" class="text-center">No hay visitas registradas.</td></tr>
         {% endfor %}

@@ -1,4 +1,13 @@
 {% extends 'granjas/base.html' %}
+{% comment %}
+    Nombre de la plantilla: lote_detail.html
+    Módulo: Granjas / Lotes
+    Descripción: Detalle de un Lote, mostrando su perfil sanitario (1:1) e historial
+    de visitas veterinarias (N:M mediante el modelo intermedio VisitaVeterinaria).
+    Hereda de: granjas/base.html
+    Variables de contexto recibidas:
+        - lote: objeto Lote con select_related/prefetch_related aplicados en la View.
+{% endcomment %}
 {% block content %}
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -15,7 +24,7 @@
             <p><strong>Galpón:</strong> {{ lote.galpon.numero }} ({{ lote.galpon.granja.nombre }})</p>
             <p><strong>Raza:</strong> {{ lote.raza }}</p>
             <p><strong>Cantidad Inicial:</strong> {{ lote.cantidad_inicial }}</p>
-            <p><strong>Fecha de Ingreso:</strong> {{ lote.fecha_ingreso }}</p>
+            <p><strong>Fecha de Ingreso:</strong> {{ lote.fecha_ingreso|date:"d/m/Y" }}</p>
             <p><strong>Estado:</strong>
                 <span class="badge bg-success">{{ lote.get_estado_display }}</span>
             </p>
@@ -28,10 +37,15 @@
             <h4 class="card-title m-0">Perfil Sanitario (Relación 1:1)</h4>
         </div>
         <div class="card-body">
+            {% comment %}
+                Filtros aplicados: floatformat normaliza los decimales del perfil
+                sanitario y date formatea la fecha, ambos sin modificar el modelo.
+            {% endcomment %}
             {% if lote.perfil_sanitario %}
-                <p><strong>Peso Promedio:</strong> {{ lote.perfil_sanitario.peso_promedio_gr }} g</p>
-                <p><strong>Índice de Mortalidad:</strong> {{ lote.perfil_sanitario.indice_mortalidad }}%</p>
-                <p><strong>Conversión Alimenticia:</strong> {{ lote.perfil_sanitario.conversion_alimenticia }}</p>
+                <p><strong>Peso Promedio:</strong> {{ lote.perfil_sanitario.peso_promedio_gr|floatformat:2 }} g</p>
+                <p><strong>Índice de Mortalidad:</strong> {{ lote.perfil_sanitario.indice_mortalidad|floatformat:1 }}%</p>
+                <p><strong>Conversión Alimenticia:</strong> {{ lote.perfil_sanitario.conversion_alimenticia|floatformat:2 }}</p>
+                <p><strong>Fecha de Evaluación:</strong> {{ lote.perfil_sanitario.fecha_evaluacion|date:"d/m/Y" }}</p>
                 <p><strong>Certificado Sanitario:</strong>
                     {% if lote.perfil_sanitario.certificado_sanitario %}
                         <span class="badge bg-success">Sí</span>
@@ -54,24 +68,15 @@
             <table class="table table-hover mb-0">
                 <thead>
                     <tr>
-                        <th>Fecha</th>
                         <th>Veterinario</th>
+                        <th>Fecha</th>
                         <th>Diagnóstico</th>
                         <th>Estado del Lote</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for visita in lote.visitas_veterinarias.all %}
-                    <tr>
-                        <td>{{ visita.fecha_visita }}</td>
-                        <td>{{ visita.veterinario.nombre_completo }}</td>
-                        <td>{{ visita.diagnostico }}</td>
-                        <td>
-                            <span class="badge {% if visita.estado_lote == 'SALUDABLE' %}bg-success{% elif visita.estado_lote == 'OBSERVACION' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
-                                {{ visita.get_estado_lote_display }}
-                            </span>
-                        </td>
-                    </tr>
+                        {% include 'granjas/includes/_visita_row.html' with visita=visita mostrar_lote=False mostrar_acciones=False %}
                     {% empty %}
                     <tr>
                         <td colspan="4" class="text-muted">No se han registrado visitas veterinarias para este lote.</td>

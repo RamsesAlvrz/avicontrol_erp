@@ -165,3 +165,36 @@ Se refactorizó la capa de presentación (Templates) del sistema `Avicontrol ERP
 
 4. **Validación de Seguridad y Auto-escape XSS:**
    - Verificación del *auto-escaping* nativo de Django al probar la inyección de etiquetas `<script>` en formularios, confirmando la sanitización a entidades HTML (`&lt;script&gt;`) y previniendo ataques Cross-Site Scripting.
+
+## Laboratorio 06 — Parte 2: Refactorización de Templates (investigación propia — Lote)
+
+### Templates refactorizados
+- **lote_list.html**: ya heredaba de `base.html` desde el Lab 04. Se agregó:
+  - Filtro `upper` sobre `codigo_lote`.
+  - Comentario `{% comment %}` documentando la plantilla (nombre, módulo, descripción,
+    herencia, variables de contexto).
+  - Reutilización del include `_acciones_tabla.html` para los botones de acción.
+- **lote_detail.html**: ya heredaba de `base.html` desde el Lab 04 (muestra las relaciones
+  1:1 y N:M de Lote). Se agregó:
+  - Filtros `floatformat` (peso promedio, índice de mortalidad, conversión alimenticia) y
+    `date` (fechas de evaluación e ingreso).
+  - Comentario documentando la plantilla y los filtros aplicados al perfil sanitario.
+  - Reemplazo de la tabla de visitas veterinarias por el include reutilizable
+    `_visita_row.html`.
+
+### Fragmento reutilizable (Ejercicio 11)
+- **includes/_visita_row.html**: fila de tabla para una visita veterinaria (relación N:M vía
+  el modelo intermedio `VisitaVeterinaria`), compartida entre `visita_list.html` (listado
+  general, con columna de lote y acciones) y `lote_detail.html` (detalle de un lote, solo
+  lectura). Parametrizado con `mostrar_lote` y `mostrar_acciones`, y encadena con el include
+  `_acciones_tabla.html` ya existente en el proyecto para los botones Editar/Eliminar.
+
+### Seguridad verificada (Ejercicio 12)
+Se confirmó que Django escapa automáticamente caracteres especiales (`<script>`) ingresados
+en el campo `diagnostico` del formulario de Visita Veterinaria, tanto en `visita_list.html`
+como en `lote_detail.html`, previniendo ataques XSS sin configuración adicional.
+
+### Flujo CRUD verificado (Ejercicio 13)
+Se confirmó que las operaciones de crear, listar, editar y eliminar sobre Lote y Visita
+Veterinaria siguen funcionando exactamente igual después de la refactorización de sus
+Templates.
