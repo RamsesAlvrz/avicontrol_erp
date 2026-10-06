@@ -1,0 +1,29 @@
+{% comment %}
+    Fragmento reutilizable: fila de una visita veterinaria.
+    Se usa en visita_list.html (listado general, con acciones) y en
+    lote_detail.html (detalle de un lote, solo lectura).
+    Reutiliza "granjas/includes/_acciones_tabla.html" para los botones,
+    manteniendo el mismo patrón usado en granja_list.html y lote_list.html.
+    Parámetros esperados:
+        - visita: objeto VisitaVeterinaria
+        - mostrar_lote: True/False -> muestra la columna del código de lote
+        - mostrar_acciones: True/False -> muestra la celda de acciones
+{% endcomment %}
+<tr>
+    {% if mostrar_lote %}
+        <td>{{ visita.lote.codigo_lote }}</td>
+    {% endif %}
+    <td>{{ visita.veterinario.nombre_completo }}</td>
+    <td>{{ visita.fecha_visita|date:"d/m/Y" }}</td>
+    <td>{{ visita.diagnostico|truncatechars:60 }}</td>
+    <td>
+        <span class="badge {% if visita.estado_lote == 'SALUDABLE' %}bg-success{% elif visita.estado_lote == 'OBSERVACION' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+            {{ visita.get_estado_lote_display }}
+        </span>
+    </td>
+    {% if mostrar_acciones %}
+        <td>
+            {% include "granjas/includes/_acciones_tabla.html" with update_url="granjas:visita_update" delete_url="granjas:visita_delete" item_pk=visita.pk %}
+        </td>
+    {% endif %}
+</tr>

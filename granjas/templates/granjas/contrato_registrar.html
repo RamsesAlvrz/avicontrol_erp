@@ -1,0 +1,50 @@
+{% extends 'granjas/base.html' %}
+
+{% comment %}
+    Nombre de la plantilla: contrato_registrar.html
+    Módulo: Granjas / Proveedores — Laboratorio 07 (ORM avanzado)
+    Descripción: Formulario que registra un Contrato de Proveedor dentro de una
+    transaction.atomic(); si el proveedor no tiene cupos_disponibles, la vista
+    cancela toda la operación y reenvía aquí mismo el mensaje de error.
+    Hereda de: granjas/base.html
+    Variables de contexto recibidas:
+        - form: ContratoProveedorForm
+        - titulo: texto del encabezado de la tarjeta
+{% endcomment %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+
+        {# Mensajes de django.contrib.messages: aquí aparece el error de la transacción #}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">{{ titulo }}</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Al guardar, se crea el Contrato y se descuenta 1 cupo del Proveedor
+                    seleccionado (campo <code>cupos_disponibles</code>) dentro de la misma
+                    transacción. Si el proveedor no tiene cupos, no se guarda nada.
+                </p>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'granjas:contrato_list' %}" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">Registrar Contrato</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

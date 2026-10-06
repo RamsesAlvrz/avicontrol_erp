@@ -1,0 +1,62 @@
+{% extends 'granjas/base.html' %}
+
+{% comment %}
+    Nombre de la plantilla: contrato_list.html
+    Módulo: Granjas / Proveedores — Laboratorio 07 (ORM avanzado)
+    Descripción: Listado de Contratos de Proveedores. Muestra datos de dos
+    relaciones ForeignKey (granja y proveedor) por fila; la View optimiza esta
+    consulta con select_related('granja', 'proveedor') (Ejercicio 8).
+    Hereda de: granjas/base.html
+    Variables de contexto recibidas:
+        - contratos: QuerySet de ContratoProveedor con granja y proveedor precargados
+{% endcomment %}
+
+{% block content %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Contratos de Proveedores</h2>
+    <div>
+        <a href="{% url 'granjas:reporte_proveedores' %}" class="btn btn-outline-dark">Ver Reporte</a>
+        <a href="{% url 'granjas:contrato_create' %}" class="btn btn-primary">+ Nuevo Contrato</a>
+    </div>
+</div>
+
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Granja</th>
+            <th>Proveedor</th>
+            <th>Fecha Inicio</th>
+            <th>Entregas / Mes</th>
+            <th>Monto Unitario</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {# granja y proveedor ya vienen precargados por select_related: ningún acceso aquí dispara una consulta extra #}
+        {% for contrato in contratos %}
+        <tr>
+            <td>{{ contrato.granja.nombre }}</td>
+            <td>{{ contrato.proveedor.razon_social }}</td>
+            <td>{{ contrato.fecha_inicio }}</td>
+            <td>{{ contrato.cantidad_entregas_mensuales }}</td>
+            <td>S/ {{ contrato.monto_unitario|floatformat:2 }}</td>
+            <td>
+                <span class="badge {% if contrato.estado_contrato == 'ACTIVO' %}bg-success{% else %}bg-secondary{% endif %}">
+                    {{ contrato.get_estado_contrato_display }}
+                </span>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center">No hay contratos registrados.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

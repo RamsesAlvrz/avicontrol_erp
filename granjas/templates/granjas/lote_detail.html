@@ -1,0 +1,90 @@
+{% extends 'granjas/base.html' %}
+{% comment %}
+    Nombre de la plantilla: lote_detail.html
+    Módulo: Granjas / Lotes
+    Descripción: Detalle de un Lote, mostrando su perfil sanitario (1:1) e historial
+    de visitas veterinarias (N:M mediante el modelo intermedio VisitaVeterinaria).
+    Hereda de: granjas/base.html
+    Variables de contexto recibidas:
+        - lote: objeto Lote con select_related/prefetch_related aplicados en la View.
+{% endcomment %}
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Detalle de Lote: {{ lote.codigo_lote }}</h2>
+        <a href="{% url 'granjas:lote_list' %}" class="btn btn-secondary">Volver al Listado</a>
+    </div>
+
+    <!-- Datos generales del Lote -->
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h4 class="card-title m-0">Información General</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Galpón:</strong> {{ lote.galpon.numero }} ({{ lote.galpon.granja.nombre }})</p>
+            <p><strong>Raza:</strong> {{ lote.raza }}</p>
+            <p><strong>Cantidad Inicial:</strong> {{ lote.cantidad_inicial }}</p>
+            <p><strong>Fecha de Ingreso:</strong> {{ lote.fecha_ingreso|date:"d/m/Y" }}</p>
+            <p><strong>Estado:</strong>
+                <span class="badge bg-success">{{ lote.get_estado_display }}</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 1: RELACIÓN 1:1 (Perfil Sanitario) -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="card-title m-0">Perfil Sanitario (Relación 1:1)</h4>
+        </div>
+        <div class="card-body">
+            {% comment %}
+                Filtros aplicados: floatformat normaliza los decimales del perfil
+                sanitario y date formatea la fecha, ambos sin modificar el modelo.
+            {% endcomment %}
+            {% if lote.perfil_sanitario %}
+                <p><strong>Peso Promedio:</strong> {{ lote.perfil_sanitario.peso_promedio_gr|floatformat:2 }} g</p>
+                <p><strong>Índice de Mortalidad:</strong> {{ lote.perfil_sanitario.indice_mortalidad|floatformat:1 }}%</p>
+                <p><strong>Conversión Alimenticia:</strong> {{ lote.perfil_sanitario.conversion_alimenticia|floatformat:2 }}</p>
+                <p><strong>Fecha de Evaluación:</strong> {{ lote.perfil_sanitario.fecha_evaluacion|date:"d/m/Y" }}</p>
+                <p><strong>Certificado Sanitario:</strong>
+                    {% if lote.perfil_sanitario.certificado_sanitario %}
+                        <span class="badge bg-success">Sí</span>
+                    {% else %}
+                        <span class="badge bg-danger">No</span>
+                    {% endif %}
+                </p>
+            {% else %}
+                <p class="text-muted m-0">Este lote no cuenta con perfil sanitario registrado.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- SECCIÓN 2: RELACIÓN N:M (Visitas Veterinarias vía through) -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h4 class="card-title m-0">Historial de Visitas Veterinarias (Relación N:M)</h4>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Veterinario</th>
+                        <th>Fecha</th>
+                        <th>Diagnóstico</th>
+                        <th>Estado del Lote</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visita in lote.visitas_veterinarias.all %}
+                        {% include 'granjas/includes/_visita_row.html' with visita=visita mostrar_lote=False mostrar_acciones=False %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-muted">No se han registrado visitas veterinarias para este lote.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

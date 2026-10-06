@@ -1,0 +1,56 @@
+{% comment %}
+    Nombre de la plantilla: proveedor_list.html
+    Módulo: Granjas / Proveedores
+    Descripción: Muestra el listado completo de proveedores registrados en la base de datos de AVICONTROL_ERP.
+    Hereda de: granjas/base.html
+    Variables de contexto recibidas:
+        - proveedores: QuerySet con los registros del modelo Proveedor.
+{% endcomment %}
+
+{% extends 'granjas/base.html' %}
+
+{% block content %}
+{# Encabezado superior con título de sección y botón de navegación para crear nuevo registro #}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Directorio de Proveedores</h2>
+    <a href="{% url 'granjas:proveedor_create' %}" class="btn btn-primary">+ Nuevo Proveedor</a>
+</div>
+
+{# Tabla principal de visualización con clases estéticas de Bootstrap 5 #}
+<table class="table table-striped table-hover shadow-sm">
+    <thead class="table-dark">
+        <tr>
+            <th>Razón Social</th>
+            <th>RUC</th>
+            <th>Teléfono</th>
+            <th>Email</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {# Recorrido de la lista de proveedores pasada desde views.py #}
+        {% for prov in proveedores %}
+        <tr>
+            {# Filtro |upper para estandarizar la razón social en mayúsculas #}
+            <td><strong>{{ prov.razon_social|upper }}</strong></td>
+            <td>{{ prov.ruc }}</td>
+            <td>{{ prov.telefono }}</td>
+            
+            {# Filtro |default para mostrar un guion (-) si el email no está registrado o es None #}
+            <td>{{ prov.email|default:"-" }}</td>
+            
+            {# Enlaces de acción que pasan prov.pk como parámetro a las URLs dinámicas #}
+            <td>
+                <a href="{% url 'granjas:proveedor_update' prov.pk %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'granjas:proveedor_delete' prov.pk %}" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        {# Mensaje informativo cuando la consulta no retorna registros #}
+        <tr>
+            <td colspan="5" class="text-center">No hay proveedores registrados.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

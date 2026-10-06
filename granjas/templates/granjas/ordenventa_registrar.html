@@ -1,0 +1,94 @@
+{% extends 'granjas/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">+ Registrar Orden de Venta</h4>
+        </div>
+        <div class="card-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label font-weight-bold">Número de Comprobante:</label>
+                        <input type="text" name="numero_comprobante" class="form-control" placeholder="Ej. F001-00045" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label font-weight-bold">Cliente:</label>
+                        <select name="cliente" class="form-select" required>
+                            <option value="">-- Seleccione Cliente --</option>
+                            {% for c in clientes %}
+                                <option value="{{ c.id }}">{{ c.razon_social|default:c }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label font-weight-bold">Fecha de Emisión:</label>
+                        <input type="date" name="fecha_emision" class="form-control" value="{{ hoy|date:'Y-m-d' }}" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label font-weight-bold">Unidad de Transporte:</label>
+                        <select name="transporte" class="form-select">
+                            <option value="">-- Sin Transporte asignado --</option>
+                            {% for t in transportes %}
+                                <option value="{{ t.id }}">{{ t.placa|default:t }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label font-weight-bold">Estado de Entrega:</label>
+                        <select name="estado_entrega" class="form-select">
+                            <option value="PENDIENTE">PENDIENTE</option>
+                            <option value="EN_TRANSITO">EN TRÁNSITO</option>
+                            <option value="ENTREGADO">ENTREGADO</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <h5 class="text-secondary mb-3">Detalle de Producto y Stock</h5>
+
+                <div class="mb-3">
+                    <label class="form-label font-weight-bold">Lote de Producción (Huevo):</label>
+                    <select name="produccion" class="form-select" required>
+                        <option value="">-- Seleccione Lote con Stock --</option>
+                        {% for p in producciones %}
+                            <option value="{{ p.id }}">{{ p }} - (Stock disponible: {{ p.stock_jabas }} jabas)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label font-weight-bold">Cantidad de Jabas a Vender:</label>
+                        <input type="number" name="cantidad" class="form-control" min="1" placeholder="Ej. 10" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label font-weight-bold">Precio Unitario (S/):</label>
+                        <input type="number" step="0.01" name="precio_unitario" class="form-control" placeholder="Ej. 18.50" required>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'granjas:ordenventa_list' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-success px-4">Procesar Venta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'granjas/base.html' %}
+
+{% comment %}
+    Nombre de la plantilla: reporte.html
+    Módulo: Granjas / Proveedores — Laboratorio 07 (ORM avanzado)
+    Descripción: Muestra los resultados de aggregate() y annotate() calculados
+    en la View reporte_proveedores (Ejercicios 4, 5 y 6), además de dos
+    consultas armadas con el QuerySet personalizado de Granja (Ejercicio 7).
+    Hereda de: granjas/base.html
+    Variables de contexto recibidas:
+        - total_general: dict devuelto por aggregate() -> {'total': Decimal}
+        - proveedores_con_contratos: QuerySet de Proveedor anotado con total_contratos
+        - contratos_por_estado: QuerySet de dicts agrupados por estado_contrato
+        - granjas_vigentes / granjas_nuevas_mes: QuerySets del manager personalizado
+{% endcomment %}
+
+{% block content %}
+<h2 class="mb-4">Reporte de Proveedores y Contratos</h2>
+
+{# EJERCICIO 4: aggregate() -> un único total global, no un QuerySet #}
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-dark text-white">
+        <h5 class="card-title m-0">Monto total facturado (cantidad × monto, con F())</h5>
+    </div>
+    <div class="card-body">
+        <h3 class="text-success">
+            {# Filtro floatformat sobre un valor calculado, tal como pide el Ejercicio 6 #}
+            S/ {{ total_general.total|default:0|floatformat:2 }}
+        </h3>
+        <p class="text-muted m-0">
+            Calculado con <code>aggregate(total=Sum(F('cantidad_entregas_mensuales') * F('monto_unitario')))</code>.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    {# EJERCICIO 5a: annotate() -> un valor por objeto (Count de contratos por proveedor) #}
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title m-0">Contratos por Proveedor (annotate)</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-hover mb-0">
+                    <thead><tr><th>Proveedor</th><th>N° Contratos</th></tr></thead>
+                    <tbody>
+                        {% for prov in proveedores_con_contratos %}
+                        <tr>
+                            <td>{{ prov.razon_social }}</td>
+                            <td><span class="badge bg-primary">{{ prov.total_contratos }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2" class="text-muted">Sin proveedores registrados.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# EJERCICIO 5b: values().annotate() -> agrupado por estado #}
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title m-0">Contratos agrupados por Estado</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-hover mb-0">
+                    <thead><tr><th>Estado</th><th>Cantidad</th></tr></thead>
+                    <tbody>
+                        {% for grupo in contratos_por_estado %}
+                        <tr>
+                            <td>{{ grupo.estado_contrato }}</td>
+                            <td><span class="badge bg-secondary">{{ grupo.cantidad }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2" class="text-muted">Sin contratos registrados.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# EJERCICIO 7: resultados del QuerySet personalizado de Granja, reutilizado en esta View #}
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h5 class="card-title m-0">Indicadores con el QuerySet personalizado de Granja</h5>
+    </div>
+    <div class="card-body">
+        <p>Granjas con licencia sanitaria vigente (<code>Granja.objects.con_licencia_vigente()</code>):
+            <strong>{{ granjas_vigentes.count }}</strong>
+        </p>
+        <p class="mb-0">Granjas registradas este mes (<code>Granja.objects.registradas_este_mes()</code>):
+            <strong>{{ granjas_nuevas_mes.count }}</strong>
+        </p>
+    </div>
+</div>
+{% endblock %}
