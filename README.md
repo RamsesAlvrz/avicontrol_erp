@@ -289,3 +289,93 @@ Se desarrolló e integró de manera modular la lógica avanzada del ORM de Djang
 - `GET /granjas/reporte-ventas/` — Pantalla de reportes comerciales y métricas del subdominio de ventas.
 - `GET /granjas/detalles-venta/` — Listado optimizado de detalles de ventas ($O(1)$ consulta SQL).
 - `GET/POST /granjas/ordenes-venta/registrar/` — Registro completo de orden y detalles con transacción atómica.
+
+# Laboratorio 08 — Implementación de API REST
+
+## Descripción
+
+En el Laboratorio 08 se implementó una API REST utilizando Django REST Framework en el proyecto Avicontrol ERP. El desarrollo se dividió en dos partes: la primera enfocada en los modelos trabajados durante las semanas anteriores y la segunda en los modelos de la investigación propia.
+
+## Parte 1 — Implementación de API REST
+
+Se desarrollaron serializers, vistas y rutas para exponer información de los modelos Equipamiento y OrdenVenta.
+
+**Funcionalidades implementadas:**
+
+- ModelSerializer para transformar los datos de los modelos.
+- Validación personalizada del código de equipamiento.
+- ModelViewSet para gestionar equipamientos mediante operaciones CRUD.
+- ReadOnlyModelViewSet para consultar órdenes de venta.
+- Relaciones anidadas para visualizar información del cliente y los detalles de las órdenes.
+- Optimización de consultas mediante select_related y prefetch_related.
+- Búsqueda y ordenamiento de equipamientos.
+- Filtrado de órdenes y acción personalizada para consultar órdenes entregadas.
+
+**Endpoints principales:**
+
+| Endpoint | Descripción |
+|---|---|
+| `/api/equipamientos/` | Listar y registrar equipamientos |
+| `/api/equipamientos/{id}/` | Consultar, actualizar o eliminar un equipamiento |
+| `/api/ordenes/` | Consultar órdenes de venta |
+| `/api/ordenes/entregadas/` | Consultar órdenes entregadas |
+
+## Parte 2 — API REST de la investigación propia
+
+Se implementaron recursos adicionales correspondientes a los modelos de la investigación del proyecto Avicontrol ERP.
+
+**Funcionalidades implementadas:**
+
+- Creación de ModelSerializers para Veterinario, Lote y PerfilSanitarioLote.
+- Validación personalizada del campo colegiatura de Veterinario.
+- Implementación de ModelViewSets para Veterinario y Lote.
+- Registro de rutas mediante DefaultRouter.
+- Creación de LoteQuerySet con métodos para consultar lotes en crecimiento y finalizados.
+- Pruebas de validación mediante el shell de Django.
+- Pruebas de operaciones CRUD y respuestas HTTP.
+
+**Endpoints principales:**
+
+| Endpoint | Descripción |
+|---|---|
+| `/api/veterinarios/` | Listar y registrar veterinarios |
+| `/api/veterinarios/{id}/` | Consultar, actualizar o eliminar veterinarios |
+| `/api/lotes/` | Listar y registrar lotes |
+| `/api/lotes/{id}/` | Consultar, actualizar o eliminar lotes |
+
+## Pruebas de la API
+
+Se realizaron pruebas para verificar los siguientes códigos HTTP:
+
+| Código | Significado |
+|---|---|
+| 200 OK | Consulta exitosa |
+| 201 Created | Registro creado correctamente |
+| 400 Bad Request | Datos inválidos |
+| 404 Not Found | Recurso no encontrado |
+| 204 No Content | Registro eliminado correctamente |
+
+## Instalación y ejecución
+
+1. Instalar las dependencias del proyecto:
+
+   `pip install -r requirements.txt`
+
+2. Aplicar las migraciones:
+
+   `python manage.py migrate`
+
+3. Iniciar el servidor:
+
+   `python manage.py runserver`
+
+4. Acceder a la API REST:
+
+   `http://127.0.0.1:8000/api/`
+
+## Tecnologías utilizadas
+
+- Python
+- Django
+- Django REST Framework
+- Git y GitHub
