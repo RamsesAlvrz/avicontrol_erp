@@ -181,6 +181,16 @@ class Galpon(models.Model):
         return f"Galpón {self.numero} ({self.granja.nombre})"
 
 
+# QuerySet personalizado para los lotes
+class LoteQuerySet(models.QuerySet):
+
+    def en_crecimiento(self):
+        return self.filter(estado='CRECIMIENTO')
+
+    def finalizados(self):
+        return self.filter(estado='FINALIZADO')
+
+
 class Lote(models.Model):
     ESTADO_LOTE = [
         ('CRECIMIENTO', 'En Crecimiento'),
@@ -199,6 +209,8 @@ class Lote(models.Model):
         related_name='lotes_atendidos',
         verbose_name="Veterinarios que atendieron"
     )
+
+    objects = LoteQuerySet.as_manager()
 
     class Meta:
         verbose_name = "Lote"
