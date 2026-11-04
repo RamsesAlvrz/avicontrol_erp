@@ -1,16 +1,27 @@
-# React + Vite
+# AviControl ERP — Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Laboratorio 10 (Semana 10): componentes, props, estado (`useState`) y eventos.
 
-Currently, two official plugins are available:
+## Cómo ejecutarlo
+```bash
+cd frontend
+npm install
+npm run dev     # http://localhost:5173/
+npm run lint
+npm run build
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Componentes (`src/components`)
+| Componente | Qué hace |
+| --- | --- |
+| `Tarjeta` | Contenedor reutilizable: recibe `titulo` y `children`. |
+| `EquipoCard` | Muestra un equipo; botón "Registrar revisión" con contador (`useState`), deshabilitado si está en mantenimiento. |
+| `ListaEquipos` | Guarda la lista en el estado; buscador controlado y formulario controlado con validación (código ≥ 3 caracteres). |
+| `OrdenCard` / `DetalleItem` | Relación 1:N: la orden muestra cada detalle con `DetalleItem` y calcula el total. |
+| `ListaOrdenes` | Recorre las órdenes con `map()` y `key`. |
+| `VeterinarioCard` | Muestra un veterinario; botón con estado "Marcar favorito". |
+| `ListaVeterinarios` | Buscador controlado y formulario con validación (colegiatura ≥ 5 caracteres). |
+| `PerfilSanitarioCard` / `ListaPerfiles` | Relación 1:1 con renderizado condicional (alerta si mortalidad > 5 %). |
+| `VisitaItem` / `ReporteVisitas` | Relación N:M con modelo intermedio (visitas anidadas por veterinario). |
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Los datos están escritos a mano en `src/datos.js` con la forma de la API de la Semana 8; aún no se consume la API.

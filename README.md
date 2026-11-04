@@ -379,3 +379,54 @@ Se realizaron pruebas para verificar los siguientes códigos HTTP:
 - Django
 - Django REST Framework
 - Git y GitHub
+
+# Laboratorio 09 — Desarrollo de Interfaz de Usuario con React y Vite
+
+## Descripción
+
+En el Laboratorio 09 se desarrolló la capa de presentación del cliente (Frontend SPA) utilizando **React** y **Vite** dentro de la carpeta `/frontend`. Se migró la visualización de datos desde el renderizado en servidor (SSR con Django Templates) hacia una arquitectura interactiva en el navegador, aplicando JSX, componentes funcionales, renderizado condicional, manejo de colecciones y estilos CSS modulares.
+
+---
+
+## Parte 1 — Conceptos Fundamentales de React y Vite
+
+Se construyó la interfaz base del sistema **AviControl ERP** explorando las características principales del motor de renderizado de React:
+
+**Aspectos Implementados:**
+- **Configuración del Proyecto Frontend:** Creación de la estructura en la carpeta `frontend/` mediante Vite + React, configurando la ejecución en entorno de desarrollo local.
+- **Expresiones en JSX:** Incorporación de lógica JavaScript dentro del marcado JSX mediante llaves `{ }`, ejecutando variables de entorno, constantes numéricas y la función de cálculo del IGV/total con formateo a dos decimales (`.toFixed(2)`).
+- **Renderizado de Colecciones (`map` y `key`):** Transformación de arreglos de datos en elementos de interfaz utilizando `.map()`, asignando a cada nodo un identificador único en la propiedad `key={item.id}` para optimizar la reconciliación del Virtual DOM.
+- **Renderizado Condicional:** Evaluación de reglas de negocio en la vista usando:
+  - *Early Return*: Retorno inmediato de mensaje alternativo para arreglos vacíos (`if (!equipos || equipos.length === 0)`).
+  - *Operador Ternario (`? :`)*: Conmutación de etiquetas visuales (`badge-ok` vs `badge-warn`) según el estado operativo.
+  - *Operador Lógico AND (`&&`)*: Muestreo de alertas urgentes únicamente al cumplirse condiciones críticas.
+- **Estructuras Anidadas (Relación 1:N):** Despliegue de cabeceras (`OrdenVenta`) e ítems asociados (`DetalleVenta`) combinando métodos `.map()` anidados y calculando montos totales dinámicos mediante `.reduce()`.
+- **Estilizado y Compilación:** Aplicación de clases CSS en `App.css`, uso de estilos dinámicos en línea (`style={{ }}`) y auditoría de código mediante `npm run lint` y `npm run build`.
+
+---
+
+## Parte 2 — Interfaz de la Investigación Propia (Módulo Sanitario)
+
+Se implementó la interfaz del **Módulo de Sanidad y Control Veterinario** reflejando las entidades y relaciones trabajadas en las semanas previas del proyecto (`Veterinario`, `PerfilSanitarioLote` y `VisitaVeterinaria`).
+
+**Componentes Desarrollados:**
+
+| Componente | Entidades / Lógica Representada | Funcionalidad Clave |
+| :--- | :--- | :--- |
+| `ListaVeterinarios` | `Veterinario` | Listado del directorio de especialistas con tarjeta de datos y claves únicas por colegiatura. |
+| `ListaPerfilesSanitarios` | `PerfilSanitarioLote` (Relación 1:1) | Renderizado de estado sanitario con bordes dinámicos (`style={{ }}`), verificación de certificado SENASA y alerta de mortalidad crítica (> 5.0%). |
+| `ReporteVisitasAnidadas` | `VisitaVeterinaria` (N:M *through*) | Despliegue anidado de atenciones clínicas agrupadas por médico responsable con conteo dinámico (`visitas.length`). |
+
+**Aspectos Destacados:**
+- **Separación de Responsabilidades:** Integración limpia de componentes en `App.jsx` manteniendo la modularidad del código.
+- **Validación de Consola:** Ausencia total de errores o advertencias en las herramientas de desarrollador (`F12`), garantizando el uso correcto del atributo `key`.
+- **Control de Versiones y Distribución:** Exclusión de `node_modules/` y la carpeta de compilación `dist/` en `.gitignore`.
+
+---
+
+## Ejecución del Frontend
+
+1. **Ingresar al directorio del frontend e instalar dependencias:**
+   ```bash
+   cd frontend
+   npm install
