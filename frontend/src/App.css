@@ -96,3 +96,40 @@ button { background: #2e7d32; color: #fff; border: none; padding: 8px 14px; bord
 button:disabled { background: #bdbdbd; cursor: not-allowed; }
 .error-form { color: #721c24; background: #f8d7da; padding: 8px; border-radius: 4px; margin: 0; }
 .nota { font-size: 0.85em; color: #856404; }
+
+/* ===== Laboratorio 11 ===== */
+.navegacion { max-width: 1000px; margin: 0 auto 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.navegacion button { background: #e0e0e0; color: #333; }
+.navegacion button.activo { background: #1b5e20; color: #fff; }
+
+/* Parte 1: práctica */
+.practica-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+.carrito { border: 1px solid #e0e0e0; border-radius: 8px; padding: 14px; background: #fafafa; position: sticky; top: 10px; }
+.carrito h2 { margin-top: 0; }
+.carrito-lineas { list-style: none; padding: 0; margin: 0 0 10px; }
+.carrito-lineas li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px dashed #e0e0e0; }
+.carrito-lineas button { padding: 4px 8px; font-size: 0.85em; background: #c62828; }
+.carrito-total { font-weight: bold; font-size: 1.15em; color: #1b5e20; }
+.boton-secundario { background: #616161; }
+.aviso { display: flex; justify-content: space-between; align-items: center; background: #e8f5e9; color: #1b5e20; border-left: 5px solid #2e7d32; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px; font-weight: bold; }
+.aviso-cerrar { background: transparent; color: #1b5e20; font-size: 1.2em; padding: 0 6px; }
+
+/* Parte 2: panel de lotes */
+.resumen-panel { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.resumen-item { display: flex; flex-direction: column; background: #f1f8e9; border: 1px solid #c8e6c9; border-radius: 8px; padding: 12px; font-size: 0.9em; }
+.resumen-valor { font-size: 1.5em; font-weight: bold; color: #1b5e20; }
+.filtros-panel { display: flex; gap: 10px; align-items: flex-start; }
+.filtros-panel .buscador { flex: 1; }
+.filtros-panel select { padding: 8px 10px; border: 1px solid #bdbdbd; border-radius: 6px; }
+.tabla-panel { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.92em; }
+.tabla-panel th, .tabla-panel td { padding: 8px; border-bottom: 1px solid #e0e0e0; text-align: left; }
+.tabla-panel th { background: #f5f5f5; }
+.acciones { display: flex; gap: 6px; }
+.acciones button { padding: 5px 10px; font-size: 0.85em; }
+.boton-peligro { background: #c62828; }
+
+@media (max-width: 700px) {
+  .practica-layout { grid-template-columns: 1fr; }
+  .filtros-panel { flex-direction: column; align-items: stretch; }
+  .tabla-panel { display: block; overflow-x: auto; }
+}

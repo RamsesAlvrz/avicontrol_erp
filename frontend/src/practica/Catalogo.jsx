@@ -1,19 +1,25 @@
-
 import ProductoCard from './ProductoCard'
 
-function Catalogo({ productos }) {
+// Recibe los productos (ya filtrados por el padre) y la función onAgregar,
+// que solo pasa de largo hasta cada ProductoCard.
+function Catalogo({ productos, onAgregar }) {
   return (
     <div>
       <h2>Catálogo de productos</h2>
 
-      <div className="grid-cards">
-        {productos.map((producto) => (
-          <ProductoCard
-            key={producto.id}
-            producto={producto}
-          />
-        ))}
-      </div>
+      {productos.length === 0 ? (
+        <p className="mensaje-vacio">No hay productos que coincidan</p>
+      ) : (
+        <div className="grid-cards">
+          {productos.map((producto) => (
+            <ProductoCard
+              key={producto.id}
+              producto={producto}
+              onAgregar={onAgregar}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

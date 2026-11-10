@@ -430,3 +430,38 @@ Se implementó la interfaz del **Módulo de Sanidad y Control Veterinario** refl
    ```bash
    cd frontend
    npm install
+---
+
+# Laboratorio 11 — Comunicación entre componentes (React)
+
+## Descripción
+
+Se aplicó la comunicación entre componentes de React: **los datos bajan del padre al hijo por props** y **los avisos suben del hijo al padre con funciones recibidas por props**. Cuando varios hermanos necesitan el mismo dato, el estado se **eleva** al padre común y los valores calculables (totales, conteos, promedios) se obtienen como **datos derivados**, sin `useState`. Se usó `useEffect` con arreglo de dependencias y función de limpieza.
+
+La app (`frontend/`) tiene una barra de navegación con tres vistas: **Panel de Lotes** (Parte 2), **Práctica Cafetería** (Parte 1) y **Laboratorio 10**.
+
+## Parte 1 — Mini catálogo con carrito (`frontend/src/practica`)
+
+| Componente | Rol |
+| :--- | :--- |
+| `Practica` | Padre. Guarda `carrito`, `busqueda` y `ultimoAgregado`; define `agregarAlCarrito`, `quitarDelCarrito` y `vaciarCarrito` (con `map`, `filter` y spread, sin `push`/`splice`). |
+| `Buscador` | Campo controlado (`valor`, `onCambiar`). |
+| `Catalogo` / `ProductoCard` | Listado con `map()` y `key`; botón **Agregar** (desactivado si `stock === 0`) que llama a `onAgregar(producto)`. |
+| `Carrito` | Hermano de `Catalogo`: líneas, **Quitar** (`onQuitar(id)`), **Vaciar carrito** (`onVaciar`), total y unidades con `reduce()`, `useEffect` que actualiza `document.title`. |
+| `Aviso` | Muestra `Agregado: <nombre>` y se oculta a los 3 s (`setTimeout` + `clearTimeout` en la limpieza). |
+
+## Parte 2 — Panel administrativo: Gestión de Lotes (`frontend/src/components`)
+
+Pantalla de gestión de la entidad **`Lote`**, con datos de ejemplo escritos a mano con la forma de `GET /api/lotes/` (Semana 8).
+
+| Componente | Rol | Props que recibe |
+| :--- | :--- | :--- |
+| `PanelLotes` | Padre y único dueño del estado (`lotes`, `busqueda`, `filtroEstado`, `aviso`). `useEffect` → título `Lotes (N) — AviControl ERP`. | — |
+| `ResumenLotes` | Hermano del listado. Datos derivados: total de lotes, total de aves, en crecimiento / finalizados, promedio de aves por lote. | `lotes` |
+| `BuscadorLotes` | Filtro controlado por código o raza + selector de estado. | `valor`, `onCambiar`, `estado`, `onCambiarEstado` |
+| `ListaLotes` | Tabla; mensaje cuando no hay resultados. | `lotes`, `onEliminar`, `onCambiarEstado` |
+| `LoteFila` | Una fila con botones **Finalizar/Reactivar** y **Eliminar** que avisan al padre con el `id`. | `lote`, `onEliminar`, `onCambiarEstado` |
+| `LoteForm` | Alta controlada. Valida campos obligatorios, `codigo_lote` único y `cantidad_inicial` entera > 0; envía el registro con `onGuardar` y limpia los campos. | `codigosExistentes`, `onGuardar` |
+| `AvisoPanel` | Aviso de confirmación que desaparece a los 3 s, con limpieza del temporizador. | `mensaje`, `onCerrar` |
+
+**Verificación:** consola del navegador sin advertencias; `npm run lint` (oxlint) y `npm run build` terminan sin errores; `node_modules/` y `dist/` siguen excluidos por `.gitignore`.

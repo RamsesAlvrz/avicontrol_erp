@@ -1,4 +1,7 @@
+import { useState } from 'react'
 import './App.css'
+import Practica from './practica/Practica'
+import PanelLotes from './components/PanelLotes'
 import Tarjeta from './components/Tarjeta'
 import ListaEquipos from './components/ListaEquipos'
 import ListaOrdenes from './components/ListaOrdenes'
@@ -13,7 +16,8 @@ import {
   historialVisitasData,
 } from './datos'
 
-function App() {
+// Contenido del Laboratorio 10 (se conserva sin cambios)
+function Laboratorio10() {
   return (
     <div className="contenedor-principal">
       <header className="encabezado-app">
@@ -40,6 +44,37 @@ function App() {
         <ReporteVisitas historial={historialVisitasData} />
       </Tarjeta>
     </div>
+  )
+}
+
+const VISTAS = {
+  panel: 'Panel de Lotes (Lab 11 — Parte 2)',
+  practica: 'Práctica Cafetería (Lab 11 — Parte 1)',
+  lab10: 'Laboratorio 10',
+}
+
+function App() {
+  const [vista, setVista] = useState('panel')
+
+  return (
+    <>
+      <nav className="navegacion">
+        {Object.entries(VISTAS).map(([clave, etiqueta]) => (
+          <button
+            key={clave}
+            type="button"
+            className={vista === clave ? 'activo' : ''}
+            onClick={() => setVista(clave)}
+          >
+            {etiqueta}
+          </button>
+        ))}
+      </nav>
+
+      {vista === 'panel' && <PanelLotes />}
+      {vista === 'practica' && <Practica />}
+      {vista === 'lab10' && <Laboratorio10 />}
+    </>
   )
 }
 

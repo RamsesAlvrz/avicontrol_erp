@@ -70,3 +70,21 @@ export const historialVisitasData = [
     ],
   },
 ]
+
+// ---------- LABORATORIO 11: panel administrativo ----------
+
+// GET /api/lotes/  (LoteSerializer de la Semana 8)
+// galpon es la llave foránea (id). Lote no tiene campos decimales.
+export const lotesData = [
+  { id: 1, galpon: 1, codigo_lote: 'LOT-2026-A', cantidad_inicial: 5000, fecha_ingreso: '2026-01-15', raza: 'Cobb 500', estado: 'CRECIMIENTO' },
+  { id: 2, galpon: 1, codigo_lote: 'LOT-2026-B', cantidad_inicial: 4200, fecha_ingreso: '2026-02-03', raza: 'Ross 308', estado: 'CRECIMIENTO' },
+  { id: 3, galpon: 2, codigo_lote: 'LOT-2026-C', cantidad_inicial: 3800, fecha_ingreso: '2025-11-20', raza: 'Hy-Line Brown', estado: 'FINALIZADO' },
+  { id: 4, galpon: 2, codigo_lote: 'LOT-2026-D', cantidad_inicial: 6000, fecha_ingreso: '2026-03-10', raza: 'Cobb 500', estado: 'CRECIMIENTO' },
+  { id: 5, galpon: 3, codigo_lote: 'LOT-2026-E', cantidad_inicial: 2500, fecha_ingreso: '2025-10-05', raza: 'Lohmann Brown', estado: 'FINALIZADO' },
+]
+
+// Opciones del campo "estado" (choices ESTADO_LOTE del modelo)
+export const ESTADOS_LOTE = {
+  CRECIMIENTO: 'En Crecimiento',
+  FINALIZADO: 'Procesado / Finalizado',
+}

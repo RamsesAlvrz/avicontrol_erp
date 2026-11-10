@@ -1,5 +1,8 @@
+// Componente hijo: muestra un producto y AVISA al padre con onAgregar(producto).
+// No modifica la prop "producto" ni guarda el carrito.
+function ProductoCard({ producto, onAgregar }) {
+  const agotado = producto.stock === 0
 
-function ProductoCard({ producto }) {
   return (
     <div className="card-item">
       <h3>{producto.nombre}</h3>
@@ -10,11 +13,21 @@ function ProductoCard({ producto }) {
 
       <p>Stock: {producto.stock}</p>
 
-      {producto.stock === 0 && (
+      {agotado && (
         <p style={{ color: 'red', fontWeight: 'bold' }}>
           Agotado
         </p>
       )}
+
+      {/* Correcto: se pasa una función flecha; React la ejecuta solo al hacer clic.
+          Incorrecto (Ejercicio 3): onClick={onAgregar(producto)} la ejecuta al dibujar. */}
+      <button
+        type="button"
+        disabled={agotado}
+        onClick={() => onAgregar(producto)}
+      >
+        Agregar
+      </button>
     </div>
   )
 }
