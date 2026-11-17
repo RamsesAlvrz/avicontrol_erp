@@ -15,7 +15,7 @@ function mostrarErrores(datos) {
     .join(' | ')
 }
 
-// Laboratorio 12: ejercicios 4, 5 y 6 (GET, estados y POST).
+// Laboratorio 12: ejercicios 4 a 7 (GET, estados, POST, PATCH y DELETE).
 function ListaPractica() {
   const [equipos, setEquipos] = useState([])
   const [cargando, setCargando] = useState(true)
@@ -24,6 +24,9 @@ function ListaPractica() {
   const [errorFormulario, setErrorFormulario] = useState('')
   const [mensaje, setMensaje] = useState('')
   const [guardando, setGuardando] = useState(false)
+  const [editandoId, setEditandoId] = useState(null)
+  const [nombreEditado, setNombreEditado] = useState('')
+  const [procesandoId, setProcesandoId] = useState(null)
 
   useEffect(() => {
     let activo = true
@@ -71,11 +74,45 @@ function ListaPractica() {
     }
   }
 
+  async function guardarEdicion(equipo) {
+    setErrorFormulario('')
+    setMensaje('')
+    setProcesandoId(equipo.id)
+    try {
+      const respuesta = await api.patch(`/equipamientos/${equipo.id}/`, { nombre: nombreEditado })
+      setEquipos((actuales) => actuales.map((item) => item.id === equipo.id ? respuesta.data : item))
+      setEditandoId(null)
+      setMensaje(`Equipamiento ${equipo.codigo} actualizado correctamente.`)
+    } catch (err) {
+      setErrorFormulario(err.response?.status === 400 ? mostrarErrores(err.response.data) : 'No se pudo actualizar el equipamiento.')
+    } finally {
+      setProcesandoId(null)
+    }
+  }
+
+  async function eliminarEquipo(equipo) {
+    if (!window.confirm(`¿Eliminar el equipamiento ${equipo.codigo}?`)) return
+    setErrorFormulario('')
+    setMensaje('')
+    setProcesandoId(equipo.id)
+    try {
+      const respuesta = await api.delete(`/equipamientos/${equipo.id}/`)
+      if (respuesta.status === 204) {
+        setEquipos((actuales) => actuales.filter((item) => item.id !== equipo.id))
+        setMensaje(`Equipamiento ${equipo.codigo} eliminado correctamente.`)
+      }
+    } catch (err) {
+      setErrorFormulario(err.response?.status === 404 ? 'El equipamiento ya no existe (404).' : 'No se pudo eliminar el equipamiento.')
+    } finally {
+      setProcesandoId(null)
+    }
+  }
+
   return (
     <div className="contenedor-principal">
       <header className="encabezado-app">
         <h1>Laboratorio 12 — Equipamientos</h1>
-        <p>Consulta GET y registro POST mediante Axios y Django REST Framework.</p>
+        <p>Operaciones GET, POST, PATCH y DELETE mediante Axios y Django REST Framework.</p>
       </header>
 
       {cargando ? (
@@ -86,15 +123,30 @@ function ListaPractica() {
         <p className="mensaje-vacio">No hay equipamientos registrados.</p>
       ) : (
         <table className="tabla-panel">
-          <thead><tr><th>ID</th><th>Código</th><th>Nombre</th><th>Tipo</th><th>Estado</th></tr></thead>
+          <thead><tr><th>ID</th><th>Código</th><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr></thead>
           <tbody>
             {equipos.map((equipo) => (
               <tr key={equipo.id}>
                 <td>{equipo.id}</td>
                 <td>{equipo.codigo}</td>
-                <td>{equipo.nombre}</td>
+                <td>{editandoId === equipo.id ? (
+                  <input aria-label="Editar nombre" value={nombreEditado} onChange={(e) => setNombreEditado(e.target.value)} />
+                ) : equipo.nombre}</td>
                 <td>{equipo.tipo}</td>
                 <td>{equipo.estado}</td>
+                <td>
+                  <div className="acciones">
+                    {editandoId === equipo.id ? (
+                      <>
+                        <button type="button" disabled={procesandoId === equipo.id || !nombreEditado.trim()} onClick={() => guardarEdicion(equipo)}>Guardar</button>
+                        <button type="button" className="boton-secundario" onClick={() => setEditandoId(null)}>Cancelar</button>
+                      </>
+                    ) : (
+                      <button type="button" disabled={procesandoId === equipo.id} onClick={() => { setEditandoId(equipo.id); setNombreEditado(equipo.nombre) }}>Editar</button>
+                    )}
+                    <button type="button" className="boton-peligro" disabled={procesandoId === equipo.id} onClick={() => eliminarEquipo(equipo)}>Eliminar</button>
+                  </div>
+                </td>
               </tr>
             ))}
           </tbody>
