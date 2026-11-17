@@ -98,6 +98,13 @@ class LoteSerializer(serializers.ModelSerializer):
             'estado'
         ]
 
+    def validate_codigo_lote(self, value):
+        if len(value.strip()) < 5:
+            raise serializers.ValidationError(
+                'El código del lote debe tener al menos 5 caracteres.'
+            )
+        return value
+
 
 # Serializer de Perfil Sanitario
 class PerfilSanitarioLoteSerializer(serializers.ModelSerializer):
