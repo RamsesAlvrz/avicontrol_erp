@@ -97,7 +97,7 @@ function PanelLotes() {
 
       {cargando && <p role="status">Cargando lotes...</p>}
       {error && <p className="error-form" role="alert">{error}</p>}
-      {!cargando && !error && <ResumenLotes lotes={lotes} />
+      {!cargando && !error && <ResumenLotes lotes={lotes} />}
 
       {!cargando && !error && <BuscadorLotes
         valor={busqueda}
