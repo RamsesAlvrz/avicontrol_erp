@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { lotesData } from '../datos'
+import api from '../api'
 import BuscadorLotes from './BuscadorLotes'
 import ListaLotes from './ListaLotes'
 import ResumenLotes from './ResumenLotes'
@@ -12,13 +12,33 @@ import AvisoPanel from './AvisoPanel'
 // Baja datos por props y recibe avisos de los hijos por funciones.
 // ==========================================================
 function PanelLotes() {
-  const [lotes, setLotes] = useState(lotesData)
+  const [lotes, setLotes] = useState([])
   const [busqueda, setBusqueda] = useState('')
   const [filtroEstado, setFiltroEstado] = useState('TODOS')
   const [aviso, setAviso] = useState(null)
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState('')
 
   const mostrarAviso = (texto) => setAviso({ texto, momento: Date.now() })
   const cerrarAviso = useCallback(() => setAviso(null), [])
+
+  // Ejercicio 10: los lotes se consultan desde Django, no desde datos.js.
+  useEffect(() => {
+    let activo = true
+    async function cargarLotes() {
+      try {
+        const respuesta = await api.get('/lotes/')
+        if (activo) setLotes(respuesta.data)
+      } catch (err) {
+        console.error('No se pudieron consultar los lotes:', err)
+        if (activo) setError('No se pudo cargar la lista de lotes.')
+      } finally {
+        if (activo) setCargando(false)
+      }
+    }
+    cargarLotes()
+    return () => { activo = false }
+  }, [])
 
   // ---------- Avisos que suben desde los hijos ----------
 
@@ -68,32 +88,34 @@ function PanelLotes() {
     <div className="contenedor-principal">
       <header className="encabezado-app">
         <h1>AviControl ERP — Panel administrativo</h1>
-        <p>Laboratorio 11 — Gestión de lotes de aves (comunicación entre componentes)</p>
+        <p>Laboratorio 12 — Lotes reales desde Django (React + Axios)</p>
       </header>
 
       {aviso && (
         <AvisoPanel key={aviso.momento} mensaje={aviso.texto} onCerrar={cerrarAviso} />
       )}
 
-      <ResumenLotes lotes={lotes} />
+      {cargando && <p role="status">Cargando lotes...</p>}
+      {error && <p className="error-form" role="alert">{error}</p>}
+      {!cargando && !error && <ResumenLotes lotes={lotes} />
 
-      <BuscadorLotes
+      {!cargando && !error && <BuscadorLotes
         valor={busqueda}
         onCambiar={setBusqueda}
         estado={filtroEstado}
         onCambiarEstado={setFiltroEstado}
-      />
+      />}
 
-      <ListaLotes
+      {!cargando && !error && <ListaLotes
         lotes={lotesFiltrados}
         onEliminar={eliminarLote}
         onCambiarEstado={cambiarEstadoLote}
-      />
+      />}
 
-      <LoteForm
+      {!cargando && !error && <LoteForm
         codigosExistentes={lotes.map((l) => l.codigo_lote)}
         onGuardar={guardarLote}
-      />
+      />}
     </div>
   )
 }
