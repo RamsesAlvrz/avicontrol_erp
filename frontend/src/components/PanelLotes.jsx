@@ -45,11 +45,23 @@ function PanelLotes() {
 
   // ---------- Avisos que suben desde los hijos ----------
 
-  // LoteFila -> onEliminar(id): filter() devuelve un arreglo nuevo
-  const eliminarLote = (id) => {
+  // Ejercicio 12: confirmar y eliminar realmente en Django (DELETE 204).
+  const eliminarLote = async (id) => {
     const lote = lotes.find((l) => l.id === id)
-    setLotes(lotes.filter((l) => l.id !== id))
-    mostrarAviso(`Lote ${lote.codigo_lote} eliminado`)
+    if (!lote || !window.confirm(`¿Deseas eliminar el lote ${lote.codigo_lote}?`)) return
+
+    try {
+      await api.delete(`/lotes/${id}/`)
+      setLotes((actuales) => actuales.filter((l) => l.id !== id))
+      if (loteEditar?.id === id) setLoteEditar(null)
+      mostrarAviso(`Lote ${lote.codigo_lote} eliminado correctamente`)
+    } catch (err) {
+      if (err.response?.status === 404) {
+        setErrorFormulario('El lote ya no existe en Django (404). Actualiza la página para sincronizar la lista.')
+      } else {
+        setErrorFormulario('No se pudo eliminar el lote. Revisa la conexión con Django.')
+      }
+    }
   }
 
   // LoteFila -> onCambiarEstado(id): map() devuelve un arreglo nuevo
