@@ -147,6 +147,7 @@ function PanelLotes() {
       />}
 
       {!cargando && !error && <LoteForm
+        key={loteEditar?.id ?? 'nuevo'}
         codigosExistentes={lotes.map((l) => l.codigo_lote)}
         onGuardar={guardarLote}
         loteEditar={loteEditar}
