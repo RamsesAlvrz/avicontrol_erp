@@ -15,9 +15,10 @@ function mostrarErrores(datos) {
     .join(' | ')
 }
 
-// Laboratorio 12: ejercicios 4 a 7 (GET, estados, POST, PATCH y DELETE).
+// Laboratorio 12: ejercicios 4 a 8 (GET, estados, POST, PATCH, DELETE y búsqueda).
 function ListaPractica() {
   const [equipos, setEquipos] = useState([])
+  const [buscar, setBuscar] = useState('')
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
   const [formulario, setFormulario] = useState(formularioInicial)
@@ -32,8 +33,10 @@ function ListaPractica() {
     let activo = true
 
     async function cargarEquipos() {
+      setCargando(true)
+      setError('')
       try {
-        const respuesta = await api.get('/equipamientos/')
+        const respuesta = await api.get('/equipamientos/', { params: { search: buscar } })
         if (activo) setEquipos(respuesta.data)
       } catch (err) {
         console.error('Error al consultar equipamientos:', err)
@@ -45,7 +48,7 @@ function ListaPractica() {
 
     cargarEquipos()
     return () => { activo = false }
-  }, [])
+  }, [buscar])
 
   function cambiarCampo(evento) {
     const { name, value } = evento.target
@@ -114,6 +117,17 @@ function ListaPractica() {
         <h1>Laboratorio 12 — Equipamientos</h1>
         <p>Operaciones GET, POST, PATCH y DELETE mediante Axios y Django REST Framework.</p>
       </header>
+
+      <div className="formulario">
+        <label htmlFor="buscar-equipamiento">Buscar equipamientos por código, nombre o tipo</label>
+        <input
+          id="buscar-equipamiento"
+          type="search"
+          placeholder="Ej. C-003 o Comedero"
+          value={buscar}
+          onChange={(evento) => setBuscar(evento.target.value)}
+        />
+      </div>
 
       {cargando ? (
         <p>Cargando...</p>
