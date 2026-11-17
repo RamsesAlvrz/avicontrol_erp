@@ -465,3 +465,65 @@ Pantalla de gestión de la entidad **`Lote`**, con datos de ejemplo escritos a m
 | `AvisoPanel` | Aviso de confirmación que desaparece a los 3 s, con limpieza del temporizador. | `mensaje`, `onCerrar` |
 
 **Verificación:** consola del navegador sin advertencias; `npm run lint` (oxlint) y `npm run build` terminan sin errores; `node_modules/` y `dist/` siguen excluidos por `.gitignore`.
+
+
+## Laboratorio 12 — Ajax y servicios web (React + Django REST Framework)
+
+### Objetivo y arquitectura
+Se conectó el frontend React (Vite, puerto 5173) con la API Django REST Framework (puerto 8000) mediante Axios. Django consulta y valida los datos con ViewSets, serializers y ORM; React muestra los resultados y actualiza la interfaz sin recargar toda la página.
+
+### Puesta en marcha (Windows, dos terminales)
+**Terminal 1 — Django (desde la raíz del repositorio):**
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+```
+Si el entorno virtual ya existe y las dependencias están instaladas, omita los pasos correspondientes.
+
+**Terminal 2 — React:**
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+Abrir `http://localhost:5173/`. Para verificar la API, abrir `http://127.0.0.1:8000/api/equipamientos/` o `http://127.0.0.1:8000/api/lotes/`.
+
+### Configuración CORS y Axios
+- `config/settings.py` incluye `corsheaders` y `corsheaders.middleware.CorsMiddleware`; `CORS_ALLOWED_ORIGINS` permite `http://localhost:5173` y `http://127.0.0.1:5173` durante el desarrollo.
+- `frontend/src/api.js` centraliza la instancia de Axios con la URL base `http://127.0.0.1:8000/api`.
+- El backend y el frontend deben permanecer ejecutándose al mismo tiempo.
+
+### Endpoints utilizados
+| Recurso | Métodos | URL |
+| --- | --- | --- |
+| Equipamientos (práctica, Parte 1) | GET, POST | `/api/equipamientos/` |
+| Equipamiento individual | GET, PATCH, DELETE | `/api/equipamientos/{id}/` |
+| Lotes (panel, Parte 2) | GET, POST | `/api/lotes/` |
+| Lote individual | GET, PATCH, DELETE | `/api/lotes/{id}/` |
+
+**Búsqueda y filtros:**
+- `GET /api/equipamientos/?search=C-003` busca por código, nombre o tipo.
+- `GET /api/lotes/?search=002` busca por código o raza.
+- `GET /api/lotes/?estado=FINALIZADO` filtra por estado.
+- `GET /api/lotes/?search=002&estado=FINALIZADO` combina ambos filtros.
+
+### Funcionalidades y respuestas HTTP
+- GET lista los datos desde Django; POST crea registros (`201 Created`).
+- PATCH actualiza registros (`200 OK`) y DELETE los elimina con confirmación previa (`204 No Content`).
+- Los serializers validan los campos; los datos inválidos devuelven `400 Bad Request` y el formulario muestra el mensaje.
+- La interfaz contempla carga, error de conexión y listas vacías.
+- En el panel, `PanelLotes.jsx` administra el estado; los componentes hijos reciben datos y funciones mediante props.
+
+### Verificación
+```powershell
+cd frontend
+npm run lint
+npm run build
+```
+En la verificación local del Laboratorio 12 se obtuvo **0 errores y 0 advertencias** en lint y una compilación de producción correcta. No se deben subir `frontend/node_modules/` ni `frontend/dist/` a Git.
+
+### Nota de seguridad
+Esta integración se probó en entorno de desarrollo local. Antes de usarla en producción se deben configurar autenticación, permisos por usuario, protección de credenciales, CORS restringido y `DEBUG=False`.
