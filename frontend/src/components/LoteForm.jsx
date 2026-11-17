@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const FORMULARIO_VACIO = {
   codigo_lote: '',
@@ -8,25 +8,22 @@ const FORMULARIO_VACIO = {
   fecha_ingreso: '',
 }
 
+const obtenerFormularioInicial = (loteEditar) => {
+  if (!loteEditar) return { ...FORMULARIO_VACIO }
+
+  return {
+    codigo_lote: loteEditar.codigo_lote,
+    galpon: String(loteEditar.galpon),
+    raza: loteEditar.raza,
+    cantidad_inicial: String(loteEditar.cantidad_inicial),
+    fecha_ingreso: loteEditar.fecha_ingreso,
+  }
+}
+
 // Formulario de alta CONTROLADO. Valida y entrega el registro al padre con onGuardar.
 function LoteForm({ codigosExistentes, onGuardar, loteEditar, onCancelar, guardando, errorServidor }) {
-  const [formulario, setFormulario] = useState(FORMULARIO_VACIO)
+  const [formulario, setFormulario] = useState(() => obtenerFormularioInicial(loteEditar))
   const [error, setError] = useState('')
-
-  useEffect(() => {
-    if (loteEditar) {
-      setFormulario({
-        codigo_lote: loteEditar.codigo_lote,
-        galpon: String(loteEditar.galpon),
-        raza: loteEditar.raza,
-        cantidad_inicial: String(loteEditar.cantidad_inicial),
-        fecha_ingreso: loteEditar.fecha_ingreso,
-      })
-    } else {
-      setFormulario(FORMULARIO_VACIO)
-    }
-    setError('')
-  }, [loteEditar])
 
   const manejarCambio = (e) => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value })
