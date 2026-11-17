@@ -18,6 +18,9 @@ function PanelLotes() {
   const [aviso, setAviso] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState('')
+  const [loteEditar, setLoteEditar] = useState(null)
+  const [guardando, setGuardando] = useState(false)
+  const [errorFormulario, setErrorFormulario] = useState('')
 
   const mostrarAviso = (texto) => setAviso({ texto, momento: Date.now() })
   const cerrarAviso = useCallback(() => setAviso(null), [])
@@ -59,14 +62,33 @@ function PanelLotes() {
     mostrarAviso(`Lote ${lote.codigo_lote} ahora está ${nuevoEstado}`)
   }
 
-  // LoteForm -> onGuardar(datos): spread para agregar sin push
-  const guardarLote = (datos) => {
-    const nuevo = {
-      id: Math.max(0, ...lotes.map((l) => l.id)) + 1,
-      ...datos,
+  // El formulario avisa al padre, que realiza POST o PATCH en Django.
+  const guardarLote = async (datos) => {
+    setGuardando(true)
+    setErrorFormulario('')
+    try {
+      if (loteEditar) {
+        const respuesta = await api.patch(`/lotes/${loteEditar.id}/`, datos)
+        setLotes((actuales) => actuales.map((l) => l.id === loteEditar.id ? respuesta.data : l))
+        mostrarAviso(`Lote ${respuesta.data.codigo_lote} actualizado`)
+      } else {
+        const respuesta = await api.post('/lotes/', datos)
+        setLotes((actuales) => [...actuales, respuesta.data])
+        mostrarAviso(`Lote ${respuesta.data.codigo_lote} registrado`)
+      }
+      setLoteEditar(null)
+    } catch (err) {
+      const detalle = err.response?.data
+      if (detalle && typeof detalle === 'object') {
+        setErrorFormulario(Object.entries(detalle).map(([campo, mensajes]) =>
+          `${campo}: ${Array.isArray(mensajes) ? mensajes.join(', ') : mensajes}`
+        ).join(' | '))
+      } else {
+        setErrorFormulario('No se pudo guardar el lote. Revisa que Django esté funcionando.')
+      }
+    } finally {
+      setGuardando(false)
     }
-    setLotes([...lotes, nuevo])
-    mostrarAviso(`Lote ${nuevo.codigo_lote} registrado`)
   }
 
   // ---------- Datos derivados (no son estado) ----------
@@ -110,11 +132,16 @@ function PanelLotes() {
         lotes={lotesFiltrados}
         onEliminar={eliminarLote}
         onCambiarEstado={cambiarEstadoLote}
+        onEditar={(lote) => { setLoteEditar(lote); setErrorFormulario('') }}
       />}
 
       {!cargando && !error && <LoteForm
         codigosExistentes={lotes.map((l) => l.codigo_lote)}
         onGuardar={guardarLote}
+        loteEditar={loteEditar}
+        onCancelar={() => { setLoteEditar(null); setErrorFormulario('') }}
+        guardando={guardando}
+        errorServidor={errorFormulario}
       />}
     </div>
   )
