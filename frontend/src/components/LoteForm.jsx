@@ -20,6 +20,18 @@ const obtenerFormularioInicial = (loteEditar) => {
   }
 }
 
+const obtenerFormularioInicial = (loteEditar) => {
+  if (!loteEditar) return { ...FORMULARIO_VACIO }
+
+  return {
+    codigo_lote: loteEditar.codigo_lote,
+    galpon: String(loteEditar.galpon),
+    raza: loteEditar.raza,
+    cantidad_inicial: String(loteEditar.cantidad_inicial),
+    fecha_ingreso: loteEditar.fecha_ingreso,
+  }
+}
+
 // Formulario de alta CONTROLADO. Valida y entrega el registro al padre con onGuardar.
 function LoteForm({ codigosExistentes, onGuardar, loteEditar, onCancelar, guardando, errorServidor }) {
   const [formulario, setFormulario] = useState(() => obtenerFormularioInicial(loteEditar))
