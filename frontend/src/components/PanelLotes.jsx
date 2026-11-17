@@ -14,6 +14,7 @@ import AvisoPanel from './AvisoPanel'
 function PanelLotes() {
   const [lotes, setLotes] = useState([])
   const [busqueda, setBusqueda] = useState('')
+  const [revision, setRevision] = useState(0)
   const [filtroEstado, setFiltroEstado] = useState('TODOS')
   const [aviso, setAviso] = useState(null)
   const [cargando, setCargando] = useState(true)
@@ -25,12 +26,15 @@ function PanelLotes() {
   const mostrarAviso = (texto) => setAviso({ texto, momento: Date.now() })
   const cerrarAviso = useCallback(() => setAviso(null), [])
 
-  // Ejercicio 10: los lotes se consultan desde Django, no desde datos.js.
+  // Ejercicio 13: búsqueda y filtro combinados desde Django mediante query params.
   useEffect(() => {
     let activo = true
     async function cargarLotes() {
       try {
-        const respuesta = await api.get('/lotes/')
+        const params = {}
+        if (busqueda.trim()) params.search = busqueda.trim()
+        if (filtroEstado !== 'TODOS') params.estado = filtroEstado
+        const respuesta = await api.get('/lotes/', { params })
         if (activo) setLotes(respuesta.data)
       } catch (err) {
         console.error('No se pudieron consultar los lotes:', err)
@@ -41,7 +45,7 @@ function PanelLotes() {
     }
     cargarLotes()
     return () => { activo = false }
-  }, [])
+  }, [busqueda, filtroEstado, revision])
 
   // ---------- Avisos que suben desde los hijos ----------
 
@@ -55,6 +59,7 @@ function PanelLotes() {
       setLotes((actuales) => actuales.filter((l) => l.id !== id))
       if (loteEditar?.id === id) setLoteEditar(null)
       mostrarAviso(`Lote ${lote.codigo_lote} eliminado correctamente`)
+      setRevision((valor) => valor + 1)
     } catch (err) {
       if (err.response?.status === 404) {
         setErrorFormulario('El lote ya no existe en Django (404). Actualiza la página para sincronizar la lista.')
@@ -89,6 +94,7 @@ function PanelLotes() {
         mostrarAviso(`Lote ${respuesta.data.codigo_lote} registrado`)
       }
       setLoteEditar(null)
+      setRevision((valor) => valor + 1)
     } catch (err) {
       const detalle = err.response?.data
       if (detalle && typeof detalle === 'object') {
@@ -103,15 +109,8 @@ function PanelLotes() {
     }
   }
 
-  // ---------- Datos derivados (no son estado) ----------
-  const texto = busqueda.trim().toLowerCase()
-  const lotesFiltrados = lotes.filter((l) => {
-    const coincideTexto =
-      l.codigo_lote.toLowerCase().includes(texto) ||
-      l.raza.toLowerCase().includes(texto)
-    const coincideEstado = filtroEstado === 'TODOS' || l.estado === filtroEstado
-    return coincideTexto && coincideEstado
-  })
+  // La API ya entrega los lotes filtrados; React solo los muestra.
+  const lotesFiltrados = lotes
 
   // ---------- useEffect: título de la pestaña ----------
   useEffect(() => {
