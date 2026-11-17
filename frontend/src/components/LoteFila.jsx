@@ -1,7 +1,7 @@
 import { ESTADOS_LOTE } from '../datos'
 
 // Una fila del listado. No modifica la lista: solo AVISA al padre con el id.
-function LoteFila({ lote, onEliminar, onCambiarEstado }) {
+function LoteFila({ lote, onEliminar, onCambiarEstado, onEditar }) {
   const enCrecimiento = lote.estado === 'CRECIMIENTO'
 
   return (
@@ -17,6 +17,7 @@ function LoteFila({ lote, onEliminar, onCambiarEstado }) {
         </span>
       </td>
       <td className="acciones">
+        <button type="button" onClick={() => onEditar(lote)}>Editar</button>
         <button type="button" onClick={() => onCambiarEstado(lote.id)}>
           {enCrecimiento ? 'Finalizar' : 'Reactivar'}
         </button>

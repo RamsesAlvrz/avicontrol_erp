@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import Practica from './practica/Practica'
+import ListaPractica from './practica/ListaPractica'
 import PanelLotes from './components/PanelLotes'
 import Tarjeta from './components/Tarjeta'
 import ListaEquipos from './components/ListaEquipos'
@@ -51,6 +52,7 @@ const VISTAS = {
   panel: 'Panel de Lotes (Lab 11 — Parte 2)',
   practica: 'Práctica Cafetería (Lab 11 — Parte 1)',
   lab10: 'Laboratorio 10',
+  lab12: 'Equipamientos API (Lab 12)',
 }
 
 function App() {
@@ -74,6 +76,7 @@ function App() {
       {vista === 'panel' && <PanelLotes />}
       {vista === 'practica' && <Practica />}
       {vista === 'lab10' && <Laboratorio10 />}
+      {vista === 'lab12' && <ListaPractica />}
     </>
   )
 }

@@ -76,3 +76,14 @@ class VeterinarioViewSet(viewsets.ModelViewSet):
 class LoteViewSet(viewsets.ModelViewSet):
     queryset = Lote.objects.all()
     serializer_class = LoteSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['codigo_lote', 'raza']
+    ordering_fields = ['id', 'codigo_lote', 'fecha_ingreso', 'cantidad_inicial']
+    ordering = ['id']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        estado = self.request.query_params.get('estado')
+        if estado:
+            queryset = queryset.filter(estado=estado)
+        return queryset
